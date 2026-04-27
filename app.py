@@ -3,14 +3,8 @@ import pandas as pd
 import math
 import base64
 
-# ---------------------------------------------------------
-# PAGE CONFIGURATION
-# ---------------------------------------------------------
 st.set_page_config(page_title="Piper Dashboard", layout="wide", initial_sidebar_state="expanded")
 
-# ---------------------------------------------------------
-# CUSTOM CSS
-# ---------------------------------------------------------
 st.markdown("""
     <style>
         .stApp { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
@@ -36,9 +30,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# CONSTANTS & CONFIGURATION
-# ---------------------------------------------------------
 PALETTE =[
     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
     "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
@@ -70,9 +61,6 @@ D_right =[1.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
 D_top =[(D_left[0] + D_right[0]) / 2, D_left[1] + h]
 D_bottom =[(D_left[0] + D_right[0]) / 2, D_left[1] - h]
 
-# ---------------------------------------------------------
-# HELPER MATH FUNCTIONS
-# ---------------------------------------------------------
 def to_num(v):
     try:
         val = float(v)
@@ -104,9 +92,6 @@ def render_b64_image(svg_string):
     b64 = base64.b64encode(svg_string.encode('utf-8')).decode('utf-8')
     return f"data:image/svg+xml;base64,{b64}"
 
-# ---------------------------------------------------------
-# SVG DRAWING GENERATORS
-# ---------------------------------------------------------
 def draw_line(points, stroke="#cbd5e1", sw=1):
     pts = " ".join([f"{map_point(p)[0]},{map_point(p)[1]}" for p in points])
     return f'<polyline points="{pts}" fill="none" stroke="{stroke}" stroke-width="{sw}" stroke-dasharray="4 4" />'
@@ -168,9 +153,6 @@ def render_multiline_text(point, lines, font_size=11, fill="#64748b", opacity=0.
         svg.append(f'<text x="{x}" y="{start_y + i*line_height}" text-anchor="middle" font-size="{font_size}" font-weight="700" fill="{fill}" opacity="{opacity}" font-family="sans-serif" letter-spacing="0.5">{line}</text>')
     return "\n".join(svg)
 
-# ---------------------------------------------------------
-# UI: DASHBOARD SIDEBAR
-# ---------------------------------------------------------
 with st.sidebar:
     st.markdown("<h2>⚙️ Dashboard Settings</h2>", unsafe_allow_html=True)
     
@@ -190,9 +172,6 @@ with st.sidebar:
     show_facies = st.checkbox("Show Facies Text", True)
     show_scales = st.checkbox("Show Axis Scales (20-80)", True)
 
-# ---------------------------------------------------------
-# MAIN LOGIC & PARSING
-# ---------------------------------------------------------
 st.markdown("<h1 class='main-title'>📊 PIPER ANALYSIS DASHBOARD</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ICAR -IIWM 2026  </p>", unsafe_allow_html=True)
 
@@ -263,9 +242,6 @@ else:
     label_placeholder.selectbox("Label by Column", ["Upload file first"], disabled=True)
     st.info("👋 Welcome! Please upload an Excel file from the sidebar to generate your dashboard.")
 
-# ---------------------------------------------------------
-# GENERATE MASTER SVG & DISPLAY DASHBOARD CARDS
-# ---------------------------------------------------------
 if len(valid_rows) > 0:
     facies_svg = ""
     if show_facies:
@@ -363,14 +339,12 @@ if len(valid_rows) > 0:
     </svg>
     """
 
-    # --- PLOT DISPLAY ---
     st.markdown(f'''
     <div class="dash-card" style="display: flex; justify-content: center; overflow-x: auto; padding-bottom: 5px; margin-bottom: 5px;">
         <img src="{render_b64_image(svg_content)}" style="max-width: 100%; height: auto;">
     </div>
     ''', unsafe_allow_html=True)
-    
-    # --- DOWNLOAD BUTTON ---
+  
     col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
     with col_dl2:
         st.download_button(
@@ -382,7 +356,7 @@ if len(valid_rows) > 0:
         )
     st.markdown("<br>", unsafe_allow_html=True) # Adds a little breathing room
 
-    # --- LEGEND & TABLE ---
+ 
     col_leg, col_tab = st.columns([1, 2])
     with col_leg:
         st.markdown("<h3 style='color:#2c3e50;'>📍 Legend</h3>", unsafe_allow_html=True)
@@ -390,7 +364,6 @@ if len(valid_rows) > 0:
         for g in groups:
             c, m = style_map[g]["color"], style_map[g]["marker"]
             
-            # FIXED: Added xmlns="http://www.w3.org/2000/svg" so the browser renders it!
             icon_svg = f'<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">{symbol_path(m, 9, 9, 12, c)}</svg>'
             
             icon_b64 = render_b64_image(icon_svg)
