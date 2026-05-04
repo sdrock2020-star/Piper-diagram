@@ -123,7 +123,7 @@ def diamond_background():
     midLT = [(D_left[0] + D_top[0]) / 2, (D_left[1] + D_top[1]) / 2]
     midTR = [(D_top[0] + D_right[0]) / 2, (D_top[1] + D_right[1]) / 2]
     midLB =[(D_left[0] + D_bottom[0]) / 2, (D_left[1] + D_bottom[1]) / 2]
-    midRB = [(D_right[0] + D_bottom[0]) / 2, (D_right[1] + D_bottom[1]) / 2]
+    midRB =[(D_right[0] + D_bottom[0]) / 2, (D_right[1] + D_bottom[1]) / 2]
     midC =[(D_top[0] + D_bottom[0]) / 2, (D_top[1] + D_bottom[1]) / 2]
     return f"""
         <polygon points="{poly_points([midLT, D_top, midTR, midC])}" fill="#bfe3c6" opacity="0.6" />
@@ -239,21 +239,21 @@ if uploaded_file is not None:
         st.error(f"Error parsing file: {e}")
 else:
     group_placeholder.selectbox("Group by Column", ["Upload file first"], disabled=True)
-    label_placeholder.selectbox("Label by Column", ["Upload file first"], disabled=True)
+    label_placeholder.selectbox("Label by Column",["Upload file first"], disabled=True)
     st.info("👋 Welcome! Please upload an Excel file from the sidebar to generate your dashboard.")
 
 if len(valid_rows) > 0:
     facies_svg = ""
     if show_facies:
         facies_svg += render_multiline_text([0.5, h * 0.65],["MAGNESIUM", "TYPE"])
-        facies_svg += render_multiline_text([0.25, h * 0.16], ["CALCIUM", "TYPE"])
+        facies_svg += render_multiline_text([0.25, h * 0.16],["CALCIUM", "TYPE"])
         facies_svg += render_multiline_text([0.75, h * 0.16], ["SODIUM", "TYPE"])
         facies_svg += render_multiline_text([0.5, h * 0.33],["NO DOMINANT", "TYPE"])
         
         facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.65],["SULFATE", "TYPE"])
         facies_svg += render_multiline_text([R1[0] + 0.25, h * 0.16],["BICARBONATE", "TYPE"])
         facies_svg += render_multiline_text([R1[0] + 0.75, h * 0.16], ["CHLORIDE", "TYPE"])
-        facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.33], ["NO DOMINANT", "TYPE"])
+        facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.33],["NO DOMINANT", "TYPE"])
         
         facies_svg += render_multiline_text([D_top[0], D_top[1] - 0.43],["CALCIUM MAGNESIUM", "SULFATE"])
         facies_svg += render_multiline_text([D_bottom[0], D_bottom[1] + 0.43],["SODIUM", "BICARBONATE"])
@@ -322,17 +322,17 @@ if len(valid_rows) > 0:
         {draw_line([R1, R2, R3, R1], "#475569", 1.8)}
         {draw_line([D_left, D_top, D_right, D_bottom, D_left], "#475569", 1.8)}
 
-        <!-- Main Axis Labels -->
-        {render_text([L1[0] + 0.50, -0.10], "Ca", font_size=18)}
-        {render_text([L3[0] - 0.45, h / 2], "Mg", rotate=-60, font_size=18)}
-        {render_text([L2[0] - 0.15, 0.55], "Na+K", rotate=60, align="start", font_size=18)}
+        <!-- Main Axis Labels (Adjusted to avoid scale overlapping) -->
+        {render_text([L1[0] + 0.50, -0.14], "Ca", font_size=18)}
+        {render_text([L3[0] - 0.50, h / 2], "Mg", rotate=-60, font_size=18)}
+        {render_text([L2[0] - 0.14, 0.55], "Na+K", rotate=60, align="middle", font_size=18)}
         
-        {render_text([R2[0] - 0.50, -0.10], "Cl", font_size=18)}
-        {render_text([R3[0] + 0.45, h / 2], "SO4", rotate=60, font_size=18)}
-        {render_text([R1[0] + 0.15, 0.60], "CO3+HCO3", rotate=-60, align="end", font_size=18)}
+        {render_text([R2[0] - 0.50, -0.14], "Cl", font_size=18)}
+        {render_text([R3[0] + 0.50, h / 2], "SO4", rotate=60, font_size=18)}
+        {render_text([R1[0] + 0.14, 0.60], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
         
-        {render_text([D_left[0] + 0.15, D_top[1] - 0.55], "SO4+Cl", rotate=-60, align="end", font_size=18)}
-        {render_text([D_right[0] - 0.15, D_top[1] - 0.55], "Ca+Mg", rotate=60, align="start", font_size=18)}
+        {render_text([D_left[0] - 0.08, D_top[1] - 0.50], "SO4+Cl", rotate=-60, align="middle", font_size=18)}
+        {render_text([D_right[0] + 0.08, D_top[1] - 0.50], "Ca+Mg", rotate=60, align="middle", font_size=18)}
 
         {scale_svg}
         {svg_points}
@@ -354,9 +354,8 @@ if len(valid_rows) > 0:
             mime="image/svg+xml",
             use_container_width=True
         )
-    st.markdown("<br>", unsafe_allow_html=True) # Adds a little breathing room
+    st.markdown("<br>", unsafe_allow_html=True) 
 
- 
     col_leg, col_tab = st.columns([1, 2])
     with col_leg:
         st.markdown("<h3 style='color:#2c3e50;'>📍 Legend</h3>", unsafe_allow_html=True)
@@ -373,3 +372,4 @@ if len(valid_rows) > 0:
     with col_tab:
         st.markdown("<h3 style='color:#2c3e50;'>📊 Groundwater Facies</h3>", unsafe_allow_html=True)
         st.dataframe(pd.DataFrame(table_data), use_container_width=True, hide_index=True, height=400)
+        
