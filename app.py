@@ -54,7 +54,7 @@ gap = 0.55
 diamondShiftY = -0.28
 
 L1, L2, L3 =[0.0, 0.0],[side, 0.0],[side / 2, h]
-R1, R2, R3 =[side + gap, 0.0], [2 * side + gap, 0.0],[1.5 * side + gap, h]
+R1, R2, R3 =[side + gap, 0.0],[2 * side + gap, 0.0],[1.5 * side + gap, h]
 
 D_left =[0.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
 D_right =[1.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
@@ -108,7 +108,7 @@ def diamond_grid(step=20):
     svg =[]
     for p in range(step, 100, step):
         q = p / 100.0
-        s1 = [(1 - q) * D_left[0] + q * D_bottom[0], (1 - q) * D_left[1] + q * D_bottom[1]]
+        s1 =[(1 - q) * D_left[0] + q * D_bottom[0], (1 - q) * D_left[1] + q * D_bottom[1]]
         e1 = [(1 - q) * D_top[0] + q * D_right[0], (1 - q) * D_top[1] + q * D_right[1]]
         s2 = [(1 - q) * D_left[0] + q * D_top[0], (1 - q) * D_left[1] + q * D_top[1]]
         e2 = [(1 - q) * D_bottom[0] + q * D_right[0], (1 - q) * D_bottom[1] + q * D_right[1]]
@@ -123,7 +123,7 @@ def diamond_background():
     midLT = [(D_left[0] + D_top[0]) / 2, (D_left[1] + D_top[1]) / 2]
     midTR = [(D_top[0] + D_right[0]) / 2, (D_top[1] + D_right[1]) / 2]
     midLB =[(D_left[0] + D_bottom[0]) / 2, (D_left[1] + D_bottom[1]) / 2]
-    midRB =[(D_right[0] + D_bottom[0]) / 2, (D_right[1] + D_bottom[1]) / 2]
+    midRB = [(D_right[0] + D_bottom[0]) / 2, (D_right[1] + D_bottom[1]) / 2]
     midC =[(D_top[0] + D_bottom[0]) / 2, (D_top[1] + D_bottom[1]) / 2]
     return f"""
         <polygon points="{poly_points([midLT, D_top, midTR, midC])}" fill="#bfe3c6" opacity="0.6" />
@@ -173,7 +173,7 @@ with st.sidebar:
     show_scales = st.checkbox("Show Axis Scales (20-80)", True)
 
 st.markdown("<h1 class='main-title'>📊 PIPER ANALYSIS DASHBOARD</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-title'>ICAR -IIWM 2026  </p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-title'>ICAR -IIWM 2026</p>", unsafe_allow_html=True)
 
 df, valid_rows, table_data, groups, style_map = pd.DataFrame(), [], [],[], {}
 
@@ -239,21 +239,21 @@ if uploaded_file is not None:
         st.error(f"Error parsing file: {e}")
 else:
     group_placeholder.selectbox("Group by Column", ["Upload file first"], disabled=True)
-    label_placeholder.selectbox("Label by Column",["Upload file first"], disabled=True)
+    label_placeholder.selectbox("Label by Column", ["Upload file first"], disabled=True)
     st.info("👋 Welcome! Please upload an Excel file from the sidebar to generate your dashboard.")
 
 if len(valid_rows) > 0:
     facies_svg = ""
     if show_facies:
         facies_svg += render_multiline_text([0.5, h * 0.65],["MAGNESIUM", "TYPE"])
-        facies_svg += render_multiline_text([0.25, h * 0.16],["CALCIUM", "TYPE"])
+        facies_svg += render_multiline_text([0.25, h * 0.16], ["CALCIUM", "TYPE"])
         facies_svg += render_multiline_text([0.75, h * 0.16], ["SODIUM", "TYPE"])
         facies_svg += render_multiline_text([0.5, h * 0.33],["NO DOMINANT", "TYPE"])
         
         facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.65],["SULFATE", "TYPE"])
         facies_svg += render_multiline_text([R1[0] + 0.25, h * 0.16],["BICARBONATE", "TYPE"])
         facies_svg += render_multiline_text([R1[0] + 0.75, h * 0.16], ["CHLORIDE", "TYPE"])
-        facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.33],["NO DOMINANT", "TYPE"])
+        facies_svg += render_multiline_text([R1[0] + 0.5, h * 0.33], ["NO DOMINANT", "TYPE"])
         
         facies_svg += render_multiline_text([D_top[0], D_top[1] - 0.43],["CALCIUM MAGNESIUM", "SULFATE"])
         facies_svg += render_multiline_text([D_bottom[0], D_bottom[1] + 0.43],["SODIUM", "BICARBONATE"])
@@ -322,14 +322,14 @@ if len(valid_rows) > 0:
         {draw_line([R1, R2, R3, R1], "#475569", 1.8)}
         {draw_line([D_left, D_top, D_right, D_bottom, D_left], "#475569", 1.8)}
 
-        <!-- Main Axis Labels (Adjusted to avoid scale overlapping) -->
+        <!-- Main Axis Labels (Adjusted to be perfectly centered in the empty gap) -->
         {render_text([L1[0] + 0.50, -0.14], "Ca", font_size=18)}
         {render_text([L3[0] - 0.50, h / 2], "Mg", rotate=-60, font_size=18)}
-        {render_text([L2[0] - 0.14, 0.55], "Na+K", rotate=60, align="middle", font_size=18)}
+        {render_text([L2[0] - 0.06, 0.38], "Na+K", rotate=60, align="middle", font_size=18)}
         
         {render_text([R2[0] - 0.50, -0.14], "Cl", font_size=18)}
         {render_text([R3[0] + 0.50, h / 2], "SO4", rotate=60, font_size=18)}
-        {render_text([R1[0] + 0.14, 0.60], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
+        {render_text([R1[0] + 0.06, 0.38], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
         
         {render_text([D_left[0] - 0.08, D_top[1] - 0.50], "SO4+Cl", rotate=-60, align="middle", font_size=18)}
         {render_text([D_right[0] + 0.08, D_top[1] - 0.50], "Ca+Mg", rotate=60, align="middle", font_size=18)}
