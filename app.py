@@ -331,8 +331,8 @@ if len(valid_rows) > 0:
         {render_text([R3[0] + 0.50, h / 2], "SO4", rotate=60, font_size=18)}
         {render_text([R1[0] + 0.06, 0.38], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
         
-        {render_text([D_left[0] - 0.08, D_top[1] - 0.50], "SO4+Cl", rotate=-60, align="middle", font_size=18)}
-        {render_text([D_right[0] + 0.08, D_top[1] - 0.50], "Ca+Mg", rotate=60, align="middle", font_size=18)}
+        {render_text([D_left[0] + 0.12, D_top[1] - 0.50], "SO4+Cl", rotate=-60, align="middle", font_size=18)}
+        {render_text([D_right[0] - 0.12, D_top[1] - 0.50], "Ca+Mg", rotate=60, align="middle", font_size=18)}
 
         {scale_svg}
         {svg_points}
@@ -372,4 +372,3 @@ if len(valid_rows) > 0:
     with col_tab:
         st.markdown("<h3 style='color:#2c3e50;'>📊 Groundwater Facies</h3>", unsafe_allow_html=True)
         st.dataframe(pd.DataFrame(table_data), use_container_width=True, hide_index=True, height=400)
-        
