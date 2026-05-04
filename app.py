@@ -299,7 +299,6 @@ if len(valid_rows) > 0:
     <svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" xmlns="http://www.w3.org/2000/svg">
         <text x="{WIDTH/2}" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
 
-        <!-- Base Backgrounds -->
         <polygon points="{poly_points([L1,[0.5, 0],[0.25, h / 2]])}" fill="#fecaca" opacity="0.6" />
         <polygon points="{poly_points([[0.5, 0], L2,[0.75, h / 2]])}" fill="#d9f99d" opacity="0.6" />
         <polygon points="{poly_points([[0.25, h / 2],[0.75, h / 2], L3])}" fill="#e9d5ff" opacity="0.6" />
@@ -317,12 +316,10 @@ if len(valid_rows) > 0:
         {triangle_grid(R1, R2, R3)}
         {diamond_grid()}
 
-        <!-- Outlines -->
         {draw_line([L1, L2, L3, L1], "#475569", 1.8)}
         {draw_line([R1, R2, R3, R1], "#475569", 1.8)}
         {draw_line([D_left, D_top, D_right, D_bottom, D_left], "#475569", 1.8)}
 
-        <!-- Main Axis Labels (Adjusted to be perfectly centered in the empty gap) -->
         {render_text([L1[0] + 0.50, -0.14], "Ca", font_size=18)}
         {render_text([L3[0] - 0.50, h / 2], "Mg", rotate=-60, font_size=18)}
         {render_text([L2[0] - 0.06, 0.38], "Na+K", rotate=60, align="middle", font_size=18)}
