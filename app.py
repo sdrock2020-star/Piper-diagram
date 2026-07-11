@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import math
 import base64
+import cairosvg
 
 st.set_page_config(page_title="Piper Dashboard", layout="wide", initial_sidebar_state="expanded")
 
@@ -342,15 +343,32 @@ if len(valid_rows) > 0:
     </div>
     ''', unsafe_allow_html=True)
   
+    # Convert SVG text parameters to high-resolution PDF binary bytes
+    try:
+        pdf_bytes = cairosvg.svg2pdf(bytestring=svg_content.encode('utf-8'))
+    except Exception as e:
+        st.error(f"Error compiling PDF layout: {e}")
+        pdf_bytes = None
+
     col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
     with col_dl2:
-        st.download_button(
-            label="⬇️ Download Piper Diagram (High-Res SVG)",
-            data=svg_content,
-            file_name="Piper_Diagram.svg",
-            mime="image/svg+xml",
-            use_container_width=True
-        )
+        if pdf_bytes:
+            st.download_button(
+                label="📄 Download Piper Diagram (High-Res PDF)",
+                data=pdf_bytes,
+                file_name="IIWM_Piper_Diagram.pdf",
+                mime="application/pdf",
+                width="stretch"
+            )
+        else:
+            st.download_button(
+                label="⬇️ Download Piper Diagram (High-Res SVG)",
+                data=svg_content,
+                file_name="Piper_Diagram.svg",
+                mime="image/svg+xml",
+                width="stretch"
+            )
+
     st.markdown("<br>", unsafe_allow_html=True) 
 
     col_leg, col_tab = st.columns([1, 2])
@@ -359,13 +377,12 @@ if len(valid_rows) > 0:
         legend_html = '<div class="dash-card" style="display: flex; flex-direction: column; gap: 12px; height: 400px; overflow-y: auto;">'
         for g in groups:
             c, m = style_map[g]["color"], style_map[g]["marker"]
-            
             icon_svg = f'<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">{symbol_path(m, 9, 9, 12, c)}</svg>'
-            
             icon_b64 = render_b64_image(icon_svg)
             legend_html += f'<div style="display: flex; align-items: center; gap: 10px; font-size: 15px; color: #334155;"><img src="{icon_b64}"><span>{g}</span></div>'
         st.markdown(legend_html + '</div>', unsafe_allow_html=True)
 
     with col_tab:
         st.markdown("<h3 style='color:#2c3e50;'>📊 Groundwater Facies</h3>", unsafe_allow_html=True)
-        st.dataframe(pd.DataFrame(table_data), use_container_width=True, hide_index=True, height=400)
+        st.dataframe(pd.DataFrame(table_data), width="stretch", hide_index=True, height=400)
+        
