@@ -241,7 +241,14 @@ if uploaded_file is not None:
 else:
     group_placeholder.selectbox("Group by Column", ["Upload file first"], disabled=True)
     label_placeholder.selectbox("Label by Column", ["Upload file first"], disabled=True)
-    st.info("👋 Welcome! Please upload an Excel file from the sidebar to generate your dashboard.")
+
+    st.markdown("<div class='dash-card' style='text-align: center; padding: 40px;'>", unsafe_allow_html=True)
+    st.info("👋 Welcome! Please upload your Excel data file below to get started.")
+    main_uploaded_file = st.file_uploader("Upload Excel File (.xlsx, .xls)", type=["xlsx", "xls"], key="main_page_uploader")
+    if main_uploaded_file is not None:
+        st.session_state["uploaded_file"] = main_uploaded_file
+        st.rerun()
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if len(valid_rows) > 0:
     facies_svg = ""
