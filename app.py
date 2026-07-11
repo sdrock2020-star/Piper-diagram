@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import math
 import base64
-import cairosvg
 
 st.set_page_config(page_title="Piper Dashboard", layout="wide", initial_sidebar_state="expanded")
 
@@ -31,14 +30,14 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-PALETTE =[
+PALETTE = [
     "#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd",
     "#8c564b", "#e377c2", "#7f7f7f", "#bcbd22", "#17becf",
     "#393b79", "#637939", "#8c6d31", "#843c39", "#7b4173",
     "#3182bd", "#31a354", "#756bb1", "#636363", "#e6550d"
 ]
 
-MARKERS =[
+MARKERS = [
     "circle", "square", "triangle-up", "diamond", "triangle-down",
     "cross", "x", "triangle-left", "triangle-right", "pentagon"
 ]
@@ -54,13 +53,13 @@ side = 1.0
 gap = 0.55
 diamondShiftY = -0.28
 
-L1, L2, L3 =[0.0, 0.0],[side, 0.0],[side / 2, h]
-R1, R2, R3 =[side + gap, 0.0],[2 * side + gap, 0.0],[1.5 * side + gap, h]
+L1, L2, L3 = [0.0, 0.0], [side, 0.0], [side / 2, h]
+R1, R2, R3 = [side + gap, 0.0], [2 * side + gap, 0.0], [1.5 * side + gap, h]
 
-D_left =[0.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
-D_right =[1.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
-D_top =[(D_left[0] + D_right[0]) / 2, D_left[1] + h]
-D_bottom =[(D_left[0] + D_right[0]) / 2, D_left[1] - h]
+D_left = [0.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
+D_right = [1.5 * side + gap / 2, h + gap / 2 + diamondShiftY]
+D_top = [(D_left[0] + D_right[0]) / 2, D_left[1] + h]
+D_bottom = [(D_left[0] + D_right[0]) / 2, D_left[1] - h]
 
 def to_num(v):
     try:
@@ -76,18 +75,18 @@ def get_val(row, keys):
 
 def ternary_point(v1, v2, v3, p1, p2, p3):
     s = v1 + v2 + v3
-    if s == 0: return[0, 0]
-    return[(v1 * p1[0] + v2 * p2[0] + v3 * p3[0]) / s, (v1 * p1[1] + v2 * p2[1] + v3 * p3[1]) / s]
+    if s == 0: return [0, 0]
+    return [(v1 * p1[0] + v2 * p2[0] + v3 * p3[0]) / s, (v1 * p1[1] + v2 * p2[1] + v3 * p3[1]) / s]
 
 def diamond_xy(ca_mg, so4_cl):
     u, v = ca_mg / 100.0, so4_cl / 100.0
     cx = (D_left[0] + D_right[0]) / 2.0
     half_width = (D_right[0] - D_left[0]) / 2.0
     y0 = D_bottom[1]
-    return[cx + half_width * (v - u), y0 + h * (u + v)]
+    return [cx + half_width * (v - u), y0 + h * (u + v)]
 
 def map_point(p):
-    return[OX + p[0] * SCALE, OY - p[1] * SCALE]
+    return [OX + p[0] * SCALE, OY - p[1] * SCALE]
 
 def render_b64_image(svg_string):
     b64 = base64.b64encode(svg_string.encode('utf-8')).decode('utf-8')
@@ -98,18 +97,18 @@ def draw_line(points, stroke="#cbd5e1", sw=1):
     return f'<polyline points="{pts}" fill="none" stroke="{stroke}" stroke-width="{sw}" stroke-dasharray="4 4" />'
 
 def triangle_grid(A, B, C, step=20):
-    svg =[]
+    svg = []
     for t in range(step, 100, step):
-        for p1_args, p2_args in[((t, 100-t, 0), (t, 0, 100-t)), ((100-t, t, 0), (0, t, 100-t)), ((100-t, 0, t), (0, 100-t, t))]:
+        for p1_args, p2_args in [((t, 100-t, 0), (t, 0, 100-t)), ((100-t, t, 0), (0, t, 100-t)), ((100-t, 0, t), (0, 100-t, t))]:
             p1, p2 = ternary_point(*p1_args, A, B, C), ternary_point(*p2_args, A, B, C)
             svg.append(draw_line([p1, p2]))
     return "\n".join(svg)
 
 def diamond_grid(step=20):
-    svg =[]
+    svg = []
     for p in range(step, 100, step):
         q = p / 100.0
-        s1 =[(1 - q) * D_left[0] + q * D_bottom[0], (1 - q) * D_left[1] + q * D_bottom[1]]
+        s1 = [(1 - q) * D_left[0] + q * D_bottom[0], (1 - q) * D_left[1] + q * D_bottom[1]]
         e1 = [(1 - q) * D_top[0] + q * D_right[0], (1 - q) * D_top[1] + q * D_right[1]]
         s2 = [(1 - q) * D_left[0] + q * D_top[0], (1 - q) * D_left[1] + q * D_top[1]]
         e2 = [(1 - q) * D_bottom[0] + q * D_right[0], (1 - q) * D_bottom[1] + q * D_right[1]]
@@ -123,9 +122,9 @@ def poly_points(points):
 def diamond_background():
     midLT = [(D_left[0] + D_top[0]) / 2, (D_left[1] + D_top[1]) / 2]
     midTR = [(D_top[0] + D_right[0]) / 2, (D_top[1] + D_right[1]) / 2]
-    midLB =[(D_left[0] + D_bottom[0]) / 2, (D_left[1] + D_bottom[1]) / 2]
+    midLB = [(D_left[0] + D_bottom[0]) / 2, (D_left[1] + D_bottom[1]) / 2]
     midRB = [(D_right[0] + D_bottom[0]) / 2, (D_right[1] + D_bottom[1]) / 2]
-    midC =[(D_top[0] + D_bottom[0]) / 2, (D_top[1] + D_bottom[1]) / 2]
+    midC = [(D_top[0] + D_bottom[0]) / 2, (D_top[1] + D_bottom[1]) / 2]
     return f"""
         <polygon points="{poly_points([midLT, D_top, midTR, midC])}" fill="#bfe3c6" opacity="0.6" />
         <polygon points="{poly_points([D_left, midLT, midC, midLB])}" fill="#d5a7ec" opacity="0.6" />
@@ -147,7 +146,7 @@ def render_text(point, text, align="middle", rotate=0, offset=(0,0), font_size=1
 
 def render_multiline_text(point, lines, font_size=11, fill="#64748b", opacity=0.9):
     x, y = map_point(point)
-    svg =[]
+    svg = []
     line_height = font_size * 1.3
     start_y = y - ((len(lines) - 1) * line_height) / 2 + (font_size / 3)
     for i, line in enumerate(lines):
@@ -174,16 +173,16 @@ with st.sidebar:
     show_scales = st.checkbox("Show Axis Scales (20-80)", True)
 
 st.markdown("<h1 class='main-title'>📊 PIPER ANALYSIS DASHBOARD</h1>", unsafe_allow_html=True)
-st.markdown("<p class='sub-title'>ICAR -IIWM 2026</p>", unsafe_allow_html=True)
+st.markdown("<p class='sub-title'>ICAR - IIWM 2026</p>", unsafe_allow_html=True)
 
-df, valid_rows, table_data, groups, style_map = pd.DataFrame(), [], [],[], {}
+df, valid_rows, table_data, groups, style_map = pd.DataFrame(), [], [], [], {}
 
 if uploaded_file is not None:
     try:
         df = pd.read_excel(uploaded_file)
-        df.columns =[str(c).strip() for c in df.columns]
+        df.columns = [str(c).strip() for c in df.columns]
         fields = list(df.columns)
-        pref_fields =["District Name", "District", "Location", "Sample ID", "Sample_Id", "Sample"]
+        pref_fields = ["District Name", "District", "Location", "Sample ID", "Sample_Id", "Sample"]
         default_idx = next((i for i, f in enumerate(fields) if f in pref_fields), 0)
         
         group_field = group_placeholder.selectbox("Group by Column", fields, index=default_idx)
@@ -191,13 +190,13 @@ if uploaded_file is not None:
         
         for idx, r in df.iterrows():
             ca = to_num(get_val(r, ["Ca ppm", "Ca"]))
-            mg = to_num(get_val(r,["Mg ppm", "Mg"]))
-            na = to_num(get_val(r,["Na ppm", "Na"]))
-            k = to_num(get_val(r,["K (ppm)", "K ppm", "K"])) or 0.0
+            mg = to_num(get_val(r, ["Mg ppm", "Mg"]))
+            na = to_num(get_val(r, ["Na ppm", "Na"]))
+            k = to_num(get_val(r, ["K (ppm)", "K ppm", "K"])) or 0.0
             co3 = to_num(get_val(r, ["CO3"])) or 0.0
             hco3 = to_num(get_val(r, ["HCO3- ppm", "HCO3 ppm", "HCO3"]))
             cl = to_num(get_val(r, ["Cl ppm", "Cl"]))
-            so4 = to_num(get_val(r,["S ppm", "S", "SO4", "SO4 ppm"]))
+            so4 = to_num(get_val(r, ["S ppm", "S", "SO4", "SO4 ppm"]))
 
             if None not in [ca, mg, na, hco3, cl, so4]:
                 valid_r = {
@@ -212,7 +211,7 @@ if uploaded_file is not None:
                 if cat_sum > 0 and an_sum > 0:
                     Ca_pct, Mg_pct, NaK_pct = (Ca_meq/cat_sum)*100, (Mg_meq/cat_sum)*100, ((Na_meq+K_meq)/cat_sum)*100
                     Cl_pct, SO4_pct, HCO3CO3_pct = (Cl_meq/an_sum)*100, (SO4_meq/an_sum)*100, ((HCO3_meq+CO3_meq)/an_sum)*100
-                    
+                     
                     valid_r["cat"] = ternary_point(Ca_pct, NaK_pct, Mg_pct, L1, L2, L3)
                     valid_r["an"] = ternary_point(HCO3CO3_pct, Cl_pct, SO4_pct, R1, R2, R3)
                     valid_r["dia"] = diamond_xy(Ca_pct + Mg_pct, SO4_pct + Cl_pct)
@@ -220,6 +219,7 @@ if uploaded_file is not None:
 
                     cat_f = "Calcium type" if Ca_pct > 50 else "Magnesium type" if Mg_pct > 50 else "Sodium type" if NaK_pct > 50 else "No dominant"
                     an_f = "Bicarbonate type" if HCO3CO3_pct > 50 else "Sulfate type" if SO4_pct > 50 else "Chloride type" if Cl_pct > 50 else "No dominant"
+                    
                     if (Ca_pct+Mg_pct) >= 50 and HCO3CO3_pct >= 50: gw_type = "Ca-Mg-HCO3"
                     elif NaK_pct > 50 and HCO3CO3_pct >= 50: gw_type = "Na-HCO3"
                     elif NaK_pct > 50 and (SO4_pct+Cl_pct) > 50: gw_type = "Na-Cl" if Cl_pct >= SO4_pct else "Na-SO4"
@@ -263,7 +263,7 @@ if len(valid_rows) > 0:
 
     scale_svg = ""
     if show_scales:
-        for t in[20, 40, 60, 80]:
+        for t in [20, 40, 60, 80]:
             scale_svg += render_text(ternary_point(t, 100-t, 0, L1, L2, L3), str(t), offset=(0, 14), font_size=10, color="#475569", weight="normal")
             scale_svg += render_text(ternary_point(100-t, 0, t, L1, L2, L3), str(t), offset=(-8, 4), align="end", font_size=10, color="#475569", weight="normal")
             scale_svg += render_text(ternary_point(0, t, 100-t, L1, L2, L3), str(t), offset=(8, 4), align="start", font_size=10, color="#475569", weight="normal")
@@ -296,9 +296,21 @@ if len(valid_rows) > 0:
             svg_points += f'<text x="{x2+offset}" y="{y2+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
             svg_points += f'<text x="{x3+offset}" y="{y3+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
 
+    # Embedded Legend configurations within the main canvas layout
+    svg_legend_items = ""
+    start_x = WIDTH - 220
+    start_y = 120
+    row_height = 25
+
+    for i, g in enumerate(groups):
+        c, m = style_map[g]["color"], style_map[g]["marker"]
+        item_y = start_y + (i * row_height)
+        svg_legend_items += f'\n        <g>{symbol_path(m, start_x, item_y - 4, 10, c)}'
+        svg_legend_items += f'<text x="{start_x + 15}" y="{item_y}" font-size="13" font-weight="600" fill="#334155" font-family="sans-serif">{g}</text></g>'
+
     svg_content = f"""
     <svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-        <text x="{WIDTH/2}" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
+        <text x="500" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
 
         <polygon points="{poly_points([L1,[0.5, 0],[0.25, h / 2]])}" fill="#fecaca" opacity="0.6" />
         <polygon points="{poly_points([[0.5, 0], L2,[0.75, h / 2]])}" fill="#d9f99d" opacity="0.6" />
@@ -321,12 +333,14 @@ if len(valid_rows) > 0:
         {draw_line([R1, R2, R3, R1], "#475569", 1.8)}
         {draw_line([D_left, D_top, D_right, D_bottom, D_left], "#475569", 1.8)}
 
+        # Mg label flipped to match the upward slant (-60 degrees)
+        {render_text([0.14, h / 2], "Mg", rotate=-60, align="middle", font_size=18)}
         {render_text([L1[0] + 0.50, -0.14], "Ca", font_size=18)}
-        {render_text([L3[0] - 0.50, h / 2], "Mg", rotate=-60, font_size=18)}
         {render_text([L2[0] - 0.06, 0.38], "Na+K", rotate=60, align="middle", font_size=18)}
         
+        # SO4 label flipped to match the downward slant (60 degrees)
         {render_text([R2[0] - 0.50, -0.14], "Cl", font_size=18)}
-        {render_text([R3[0] + 0.50, h / 2], "SO4", rotate=60, font_size=18)}
+        {render_text([2.41, h / 2], "SO4", rotate=60, align="middle", font_size=18)}
         {render_text([R1[0] + 0.06, 0.38], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
         
         {render_text([D_left[0] + 0.12, D_top[1] - 0.50], "SO4+Cl", rotate=-60, align="middle", font_size=18)}
@@ -334,6 +348,10 @@ if len(valid_rows) > 0:
 
         {scale_svg}
         {svg_points}
+
+        <rect x="{start_x - 20}" y="75" width="220" height="{len(groups) * row_height + 50}" fill="#f8fafc" rx="10" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="{start_x - 5}" y="102" font-size="16" font-weight="800" fill="#1e293b" font-family="sans-serif">📍 Location Legend</text>
+        {svg_legend_items}
     </svg>
     """
 
@@ -343,9 +361,17 @@ if len(valid_rows) > 0:
     </div>
     ''', unsafe_allow_html=True)
   
-    # Convert SVG text parameters to high-resolution PDF binary bytes
     try:
-        pdf_bytes = cairosvg.svg2pdf(bytestring=svg_content.encode('utf-8'))
+        import io
+        from svglib.svglib import svg2rlg
+        from reportlab.graphics import renderPDF
+
+        svg_io = io.StringIO(svg_content)
+        drawing = svg2rlg(svg_io)
+        
+        pdf_io = io.BytesIO()
+        renderPDF.drawToFile(drawing, pdf_io)
+        pdf_bytes = pdf_io.getvalue()
     except Exception as e:
         st.error(f"Error compiling PDF layout: {e}")
         pdf_bytes = None
@@ -385,4 +411,3 @@ if len(valid_rows) > 0:
     with col_tab:
         st.markdown("<h3 style='color:#2c3e50;'>📊 Groundwater Facies</h3>", unsafe_allow_html=True)
         st.dataframe(pd.DataFrame(table_data), width="stretch", hide_index=True, height=400)
-        
