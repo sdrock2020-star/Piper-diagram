@@ -153,11 +153,19 @@ def render_multiline_text(point, lines, font_size=11, fill="#64748b", opacity=0.
         svg.append(f'<text x="{x}" y="{start_y + i*line_height}" text-anchor="middle" font-size="{font_size}" font-weight="700" fill="{fill}" opacity="{opacity}" font-family="sans-serif" letter-spacing="0.5">{line}</text>')
     return "\n".join(svg)
 
+# Safe session tracking initialization
+if "uploaded_file" not in st.session_state:
+    st.session_state["uploaded_file"] = None
+
 with st.sidebar:
     st.markdown("<h2>⚙️ Dashboard Settings</h2>", unsafe_allow_html=True)
     
     st.markdown("### 1. Data Upload")
-    uploaded_file = st.file_uploader("Upload Excel File", type=["xlsx", "xls"])
+    sidebar_file = st.file_uploader("Upload Excel File", type=["xlsx", "xls"])
+    if sidebar_file is not None:
+        st.session_state["uploaded_file"] = sidebar_file
+        
+    uploaded_file = st.session_state["uploaded_file"]
     
     st.markdown("### 2. Plot Configuration")
     title = st.text_input("Plot Title", "Hydrochemical Piper Plot")
@@ -241,9 +249,10 @@ if uploaded_file is not None:
 else:
     group_placeholder.selectbox("Group by Column", ["Upload file first"], disabled=True)
     label_placeholder.selectbox("Label by Column", ["Upload file first"], disabled=True)
-
+    
     st.markdown("<div class='dash-card' style='text-align: center; padding: 40px;'>", unsafe_allow_html=True)
     st.info("👋 Welcome! Please upload your Excel data file below to get started.")
+    
     main_uploaded_file = st.file_uploader("Upload Excel File (.xlsx, .xls)", type=["xlsx", "xls"], key="main_page_uploader")
     if main_uploaded_file is not None:
         st.session_state["uploaded_file"] = main_uploaded_file
@@ -303,11 +312,11 @@ if len(valid_rows) > 0:
             svg_points += f'<text x="{x2+offset}" y="{y2+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
             svg_points += f'<text x="{x3+offset}" y="{y3+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
 
-    # Embedded Legend configurations within the main canvas layout
+    # Vector Canvas Legend Setup
     svg_legend_items = ""
     start_x = WIDTH - 220
     start_y = 120
-    row_height = 25
+    row_height = 24
 
     for i, g in enumerate(groups):
         c, m = style_map[g]["color"], style_map[g]["marker"]
@@ -317,7 +326,7 @@ if len(valid_rows) > 0:
 
     svg_content = f"""
     <svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" xmlns="http://www.w3.org/2000/svg">
-        <text x="500" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
+        <text x="{WIDTH/2}" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
 
         <polygon points="{poly_points([L1,[0.5, 0],[0.25, h / 2]])}" fill="#fecaca" opacity="0.6" />
         <polygon points="{poly_points([[0.5, 0], L2,[0.75, h / 2]])}" fill="#d9f99d" opacity="0.6" />
@@ -340,12 +349,10 @@ if len(valid_rows) > 0:
         {draw_line([R1, R2, R3, R1], "#475569", 1.8)}
         {draw_line([D_left, D_top, D_right, D_bottom, D_left], "#475569", 1.8)}
 
-        # Mg label flipped to match the upward slant (-60 degrees)
         {render_text([0.14, h / 2], "Mg", rotate=-60, align="middle", font_size=18)}
         {render_text([L1[0] + 0.50, -0.14], "Ca", font_size=18)}
         {render_text([L2[0] - 0.06, 0.38], "Na+K", rotate=60, align="middle", font_size=18)}
         
-        # SO4 label flipped to match the downward slant (60 degrees)
         {render_text([R2[0] - 0.50, -0.14], "Cl", font_size=18)}
         {render_text([2.41, h / 2], "SO4", rotate=60, align="middle", font_size=18)}
         {render_text([R1[0] + 0.06, 0.38], "CO3+HCO3", rotate=-60, align="middle", font_size=18)}
@@ -395,7 +402,7 @@ if len(valid_rows) > 0:
             )
         else:
             st.download_button(
-                label="⬇️ Download Piper Diagram (High-Res SVG)",
+                label="⬇️ Download Piper Diagram (High-Res SVG)",    
                 data=svg_content,
                 file_name="Piper_Diagram.svg",
                 mime="image/svg+xml",
