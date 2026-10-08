@@ -308,6 +308,18 @@ if len(valid_rows) > 0:
             svg_points += f'<text x="{x2+offset}" y="{y2+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
             svg_points += f'<text x="{x3+offset}" y="{y3+offset}" font-size="10" fill="#475569" font-weight="bold" font-family="sans-serif">{lbl}</text>'
 
+    # --- IN-DIAGRAM LEGEND SETUP ---
+    svg_legend_items = ""
+    start_x = WIDTH - 220
+    start_y = 120
+    row_height = 24
+
+    for i, g in enumerate(groups):
+        c, m = style_map[g]["color"], style_map[g]["marker"]
+        item_y = start_y + (i * row_height)
+        svg_legend_items += f'\n        <g>{symbol_path(m, start_x, item_y - 4, 10, c)}'
+        svg_legend_items += f'<text x="{start_x + 15}" y="{item_y}" font-size="13" font-weight="600" fill="#334155" font-family="sans-serif">{g}</text></g>'
+
     svg_content = f"""
     <svg width="{WIDTH}" height="{HEIGHT}" viewBox="0 0 {WIDTH} {HEIGHT}" xmlns="http://www.w3.org/2000/svg">
         <text x="{WIDTH/2}" y="45" text-anchor="middle" font-size="32" font-weight="800" fill="#1e293b" font-family="sans-serif">{title}</text>
@@ -346,6 +358,11 @@ if len(valid_rows) > 0:
 
         {scale_svg}
         {svg_points}
+
+        <!-- SVG Embedded Legend -->
+        <rect x="{start_x - 20}" y="75" width="220" height="{len(groups) * row_height + 50}" fill="#f8fafc" rx="10" stroke="#e2e8f0" stroke-width="1"/>
+        <text x="{start_x - 5}" y="102" font-size="16" font-weight="800" fill="#1e293b" font-family="sans-serif">📍 Legend</text>
+        {svg_legend_items}
     </svg>
     """
 
@@ -355,15 +372,33 @@ if len(valid_rows) > 0:
     </div>
     ''', unsafe_allow_html=True)
   
+    # --- PDF GENERATION & DOWNLOAD ---
+    try:
+        import io
+        from svglib.svglib import svg2rlg
+        from reportlab.graphics import renderPDF
+
+        svg_io = io.StringIO(svg_content)
+        drawing = svg2rlg(svg_io)
+        
+        pdf_io = io.BytesIO()
+        renderPDF.drawToFile(drawing, pdf_io)
+        pdf_bytes = pdf_io.getvalue()
+    except Exception as e:
+        pdf_bytes = None
+        st.error("Missing PDF conversion libraries. Ensure `svglib` and `reportlab` are in requirements.txt.")
+
     col_dl1, col_dl2, col_dl3 = st.columns([1, 2, 1])
     with col_dl2:
-        st.download_button(
-            label="⬇️ Download Piper Diagram (High-Res SVG)",
-            data=svg_content,
-            file_name="Piper_Diagram.svg",
-            mime="image/svg+xml",
-            use_container_width=True
-        )
+        if pdf_bytes:
+            st.download_button(
+                label="📄 Download Piper Diagram (High-Res PDF)",
+                data=pdf_bytes,
+                file_name="Piper_Diagram.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+
     st.markdown("<br>", unsafe_allow_html=True) 
 
     col_leg, col_tab = st.columns([1, 2])
