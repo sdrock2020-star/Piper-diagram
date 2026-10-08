@@ -185,6 +185,14 @@ with st.sidebar:
     show_facies = st.checkbox("Show Facies Text", True)
     show_scales = st.checkbox("Show Axis Scales (20-80)", True)
 
+    # --- NEW: QR CODE EMBEDDING ---
+    st.markdown("<br><hr>", unsafe_allow_html=True) 
+    st.markdown("<h4 style='text-align: center;'>📱 Scan to open on Mobile</h4>", unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.image("https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://iiwm-piper.streamlit.app/", use_container_width=True)
+
 st.markdown("<h1 class='main-title'>📊 PIPER ANALYSIS DASHBOARD</h1>", unsafe_allow_html=True)
 st.markdown("<p class='sub-title'>ICAR -IIWM 2026</p>", unsafe_allow_html=True)
 
